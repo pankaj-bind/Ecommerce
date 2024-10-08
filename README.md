@@ -13,6 +13,10 @@ This project is a full-fledged eCommerce website built using Django, a high-leve
 
 ## Features
 - **User Authentication:** Secure user registration, login, reset password, and profile management.
+  ```
+      username: pankajbind
+      password: Pankajbind30@
+  ``
 - **Product Catalog:** Browse and search products with detailed descriptions and images.
 - **Shopping Cart:** Add, update, and remove items from the cart seamlessly.
 - **Checkout Process:** Smooth checkout flow with order summary and address management.
