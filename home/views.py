@@ -17,6 +17,21 @@ def index(request):
     selected_sort = request.GET.get('sort')
     selected_category = request.GET.get('category')
 
+    # Apply category filter BEFORE pagination
+    if selected_category:
+        query = query.filter(category__category_name=selected_category)
+
+    # Apply sorting BEFORE pagination
+    if selected_sort:
+        if selected_sort == 'newest':
+            query = query.filter(newest_product=True).order_by('-created_at')
+
+        elif selected_sort == 'priceAsc':
+            query = query.order_by('price')
+
+        elif selected_sort == 'priceDesc':
+            query = query.order_by('-price')
+
     # Pagination Configuration
     page = request.GET.get('page', 1)
     paginator = Paginator(query, 20)
@@ -27,19 +42,6 @@ def index(request):
         query = paginator.page(1)
     except EmptyPage:
         query = paginator.page(paginator.num_pages)
-
-    if selected_category:
-        query = query.filter(category__category_name=selected_category)
-
-    if selected_sort:
-        if selected_sort == 'newest':
-            query = query.filter(newest_product=True).order_by('category_id')
-
-        elif selected_sort == 'priceAsc':
-            query = query.order_by('price')
-
-        elif selected_sort == 'priceDesc':
-            query = query.order_by('-price')
 
     context = {
         'products': query,

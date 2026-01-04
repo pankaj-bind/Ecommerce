@@ -118,6 +118,7 @@ def wishlist_view(request):
 
 
 # Move to cart functionality on wishlist page.
+@login_required
 def move_to_cart(request, uid):
     product = get_object_or_404(Product, uid=uid)
 

@@ -1,113 +1,633 @@
-{% extends "base/base.html"%} {% block start %}
+{% extends "base/base.html" %}
+{% block title %}BuyNest - Your Shopping Nest{% endblock %}
+{% block start %}
+{% load static %}
+
 <style>
-  .filter-section {
-      margin-bottom: 20px;
+  /* Fresh Teal/Emerald Theme */
+  :root {
+    --theme-primary: #0d9488;
+    --theme-primary-dark: #0f766e;
+    --theme-primary-light: #14b8a6;
+    --theme-secondary: #06b6d4;
+    --theme-accent: #f59e0b;
+    --theme-gradient: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
   }
 
-  .form-group {
-      margin-bottom: 10px;
+  /* Features Strip */
+  .features-strip {
+    background: white;
+    padding: 20px 0;
+    border-bottom: 1px solid #f1f5f9;
   }
 
-  @keyframes appear {
-    from {
-      opacity: 0;
-      scale: 0.5;
+  .feature-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .feature-item i {
+    font-size: 1.4rem;
+    color: var(--theme-primary);
+  }
+
+  .feature-item span {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.85rem;
+  }
+
+  /* Products Section - FIRST */
+  .products-section {
+    padding: 50px 0 80px;
+    background: #f8fafc;
+  }
+
+  .products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 35px;
+  }
+
+  .products-title h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .products-title p {
+    color: #64748b;
+    margin: 6px 0 0;
+    font-size: 0.9rem;
+  }
+
+  /* Filter Pills */
+  .filter-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    padding: 10px 20px;
+    border-radius: 50px;
+    background: white;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #e2e8f0;
+    text-decoration: none;
+  }
+
+  .filter-pill:hover,
+  .filter-pill.active {
+    background: var(--theme-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.3);
+  }
+
+  /* Products Grid */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s ease;
+    border: 1px solid #f1f5f9;
+    position: relative;
+  }
+
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-image-wrapper {
+    position: relative;
+    padding-top: 100%;
+    background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+    overflow: hidden;
+  }
+
+  .product-image-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .product-card:hover .product-image-wrapper img {
+    transform: scale(1.08);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 10;
+    background: var(--theme-primary);
+    color: white;
+  }
+
+  .product-quick-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transform: translateX(15px);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .product-card:hover .product-quick-actions {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .quick-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+    color: #475569;
+    text-decoration: none;
+  }
+
+  .quick-action-btn:hover {
+    background: var(--theme-gradient);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .product-info {
+    padding: 18px;
+  }
+
+  .product-category-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--theme-primary);
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .product-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .product-rating i {
+    color: #fbbf24;
+    font-size: 0.7rem;
+  }
+
+  .product-rating span {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    margin-left: 4px;
+  }
+
+  .product-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    font-family: 'Inter', sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .product-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .product-title a:hover {
+    color: var(--theme-primary);
+  }
+
+  .product-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .product-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--theme-primary);
+  }
+
+  .btn-add-cart {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #1e293b;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-add-cart:hover {
+    background: var(--theme-gradient);
+    transform: scale(1.05);
+    color: white;
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  .pagination-modern {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pagination-modern .page-link {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .pagination-modern .page-link:hover {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+
+  .pagination-modern .page-item.active .page-link {
+    background: var(--theme-gradient);
+    border-color: transparent;
+    color: white;
+  }
+
+  /* Mini Promo Banner */
+  .promo-banner {
+    background: var(--theme-gradient);
+    padding: 45px 0;
+    color: white;
+    margin-top: 30px;
+  }
+
+  .promo-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 25px;
+  }
+
+  .promo-text h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .promo-text p {
+    opacity: 0.9;
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .btn-promo {
+    background: white;
+    color: var(--theme-primary);
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-promo:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    color: var(--theme-primary-dark);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: white;
+    border-radius: 20px;
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: #e2e8f0;
+    margin-bottom: 20px;
+  }
+
+  .empty-state h3 {
+    color: #1e293b;
+    margin-bottom: 10px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .empty-state p {
+    color: #64748b;
+    margin-bottom: 25px;
+  }
+
+  .btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 30px;
+    background: var(--theme-gradient);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-reset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 991px) {
+    .products-header {
+      flex-direction: column;
+      text-align: center;
     }
-    to {
-      opacity: 1;
-      scale: 1;
+
+    .promo-content {
+      flex-direction: column;
+      text-align: center;
     }
   }
 
-  .card {
-    animation: appear linear;
-    animation-timeline: view();
-    animation-range: entry 0% cover 40%;
+  @media (max-width: 767px) {
+    .products-section {
+      padding: 35px 0 60px;
+    }
+
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .product-info {
+      padding: 12px;
+    }
+
+    .product-title {
+      font-size: 0.8rem;
+    }
+
+    .product-price {
+      font-size: 1rem;
+    }
+
+    .filter-pills {
+      justify-content: center;
+    }
   }
 </style>
-<div class="container mt-3 pt-3">
-  {% include 'base/alert.html' %}
-  <!-- Filter Section -->
-  <div class="filter-section mb-3">
-    <form method="GET" class="row">
-      <div class="form-group col-md-6">
-        <label for="category">Category:</label>
-        <select id="category" name="category" class="form-control" onchange="this.form.submit()">
-          <option value="">All</option>
-          {% for category in categories %}
-          <option value="{{ category.category_name }}" {% if selected_category == category.category_name %} selected {% endif %}>
-            {{ category.category_name }}
-          </option>
-          {% endfor %}
-        </select>
+
+<!-- Features Strip -->
+<section class="features-strip">
+  <div class="container">
+    <div class="row">
+      <div class="col-6 col-md-3">
+        <div class="feature-item">
+          <i class="fas fa-shipping-fast"></i>
+          <span>Free Delivery</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-item">
+          <i class="fas fa-undo-alt"></i>
+          <span>Easy Returns</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-item">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Cash on Delivery</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-item">
+          <i class="fas fa-headset"></i>
+          <span>24/7 Support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Products Section - NOW FIRST -->
+<section class="products-section" id="products">
+  <div class="container">
+    {% include 'base/alert.html' %}
+    
+    <!-- Products Header -->
+    <div class="products-header" data-aos="fade-up">
+      <div class="products-title">
+        <h2>{% if selected_category %}{{ selected_category }}{% else %}All Products{% endif %}</h2>
+        <p>Discover our amazing collection</p>
       </div>
       
-      <!-- Sort Section -->
-      <div class="form-group col-md-6">
-        <label for="sort">Sort by:</label>
-        <select id="sort" name="sort" class="form-control" onchange="this.form.submit()">
-          <option value="">Select</option>
-          <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest</option>
-          <option value="priceAsc" {% if selected_sort == 'priceAsc' %}selected{% endif %}>Price: Low-High</option>
-          <option value="priceDesc" {% if selected_sort == 'priceDesc' %}selected{% endif %}>Price: High-Low</option>
-        </select>
+      <!-- Filter Pills -->
+      <div class="filter-pills">
+        <a href="{% url 'index' %}" class="filter-pill {% if not selected_category and not selected_sort %}active{% endif %}">All</a>
+        {% for category in categories %}
+        <a href="?category={{ category.category_name }}" class="filter-pill {% if selected_category == category.category_name %}active{% endif %}">
+          {{ category.category_name }}
+        </a>
+        {% endfor %}
+        <a href="?sort=newest" class="filter-pill {% if selected_sort == 'newest' %}active{% endif %}">🆕 New</a>
+        <a href="?sort=priceAsc" class="filter-pill {% if selected_sort == 'priceAsc' %}active{% endif %}">💰 Low-High</a>
+        <a href="?sort=priceDesc" class="filter-pill {% if selected_sort == 'priceDesc' %}active{% endif %}">💎 High-Low</a>
       </div>
-    </form>
-  </div>
-
-  <!-- Product List -->
-  <div class="row">
-    {% for product in products %}
-    <div class="col-md-3">
-      <figure class="card card-product-grid">
-        <div class="img-wrap">
-          <img src="/media/{{product.product_images.first.image}}" />
-        </div>
-        <figcaption class="info-wrap border-top">
-          <a href="{% url 'get_product' product.slug %}" class="title">
-            <b>{{ product.product_name }}</b></a>
-          <div class="price mt-2">₹{{product.price}}.00</div>
-        </figcaption>
-      </figure>
     </div>
-    {% endfor %}
-  </div>
 
-  <!-- Pagination Section -->
-  <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center mb-4">
-      {% if products.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
-          <span aria-hidden="true">&laquo; Previous</span>
-        </a>
-      </li>
-      {% else %}
-      <li class="page-item disabled">
-        <a class="page-link">Previous</a>
-      </li>
-      {% endif %}
+    <!-- Products Grid -->
+    {% if products %}
+    <div class="products-grid">
+      {% for product in products %}
+      <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:50 }}">
+        {% if product.newest_product %}
+        <span class="product-badge">New</span>
+        {% endif %}
+        
+        <div class="product-quick-actions">
+          <a href="{% url 'get_product' product.slug %}" class="quick-action-btn" title="Quick View">
+            <i class="fas fa-eye"></i>
+          </a>
+          <a href="{% url 'add_to_wishlist' product.uid %}" class="quick-action-btn" title="Add to Wishlist">
+            <i class="far fa-heart"></i>
+          </a>
+        </div>
 
-      {% for num in products.paginator.page_range %}
-      <li class="page-item {% if products.number == num %}active{% endif %}">
-        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-      </li>
+        <div class="product-image-wrapper">
+          <a href="{% url 'get_product' product.slug %}">
+            <img src="/media/{{ product.product_images.first.image }}" alt="{{ product.product_name }}">
+          </a>
+        </div>
+
+        <div class="product-info">
+          <span class="product-category-tag">{{ product.category.category_name }}</span>
+          <div class="product-rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+            <span>(4.5)</span>
+          </div>
+          <h5 class="product-title">
+            <a href="{% url 'get_product' product.slug %}">{{ product.product_name }}</a>
+          </h5>
+          <div class="product-price-row">
+            <span class="product-price">₹{{ product.price }}</span>
+            <a href="{% url 'get_product' product.slug %}" class="btn-add-cart" title="View Product">
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
       {% endfor %}
+    </div>
 
-      {% if products.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
-          <span aria-hidden="true">Next &raquo;</span>
-        </a>
-      </li>
-      {% else %}
-      <li class="page-item disabled">
-        <a class="page-link">Next</a>
-      </li>
-      {% endif %}
-    </ul>
-  </nav>
-  
-</div>
+    <!-- Pagination -->
+    {% if products.has_other_pages %}
+    <div class="pagination-wrapper">
+      <nav class="pagination-modern">
+        {% if products.has_previous %}
+        <div class="page-item">
+          <a class="page-link" href="?page={{ products.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </div>
+        {% endif %}
+
+        {% for num in products.paginator.page_range %}
+          {% if products.number == num %}
+          <div class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </div>
+          {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+          <div class="page-item">
+            <a class="page-link" href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}">{{ num }}</a>
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        {% if products.has_next %}
+        <div class="page-item">
+          <a class="page-link" href="?page={{ products.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </div>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state" data-aos="fade-up">
+      <i class="fas fa-box-open"></i>
+      <h3>No Products Found</h3>
+      <p>We couldn't find any products matching your criteria.</p>
+      <a href="{% url 'index' %}" class="btn-reset">
+        <i class="fas fa-redo"></i>Reset Filters
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Promo Banner -->
+<section class="promo-banner">
+  <div class="container">
+    <div class="promo-content" data-aos="fade-up">
+      <div class="promo-text">
+        <h3>🎉 Get 50% OFF on First Order!</h3>
+        <p>Use code <strong>NEW50</strong> at checkout. Limited time offer!</p>
+      </div>
+      <a href="{% url 'register' %}" class="btn-promo">
+        <i class="fas fa-user-plus"></i>
+        Create Account
+      </a>
+    </div>
+  </div>
+</section>
 
 {% endblock %}

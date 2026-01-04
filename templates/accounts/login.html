@@ -1,85 +1,245 @@
-{% extends "base/base.html" %} {% load static %} {% load socialaccount %} 
-{% block title %}Login{% endblock %}
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Login - BuyNest{% endblock %}
 {% block start %}
 
-<!-- ============================ COMPONENT LOGIN   ================================= -->
-<section class="section-content padding-bottom">
-  <div class="container-xl d-flex justify-content-center align-items-center mt-5">
-    <div class="row justify-content-center w-100">
-      <div class="col-xl-4">
-        <div class="card mb-4">
-          <div class="card-header" style="text-align: center; font-size: 25px">
-            Sign In
+<style>
+  .auth-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  .auth-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    max-width: 450px;
+    margin: 0 auto;
+  }
+
+  .auth-header {
+    background: var(--gradient-1);
+    padding: 40px;
+    text-align: center;
+    color: white;
+  }
+
+  .auth-header h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .auth-header p {
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .auth-body {
+    padding: 40px;
+  }
+
+  .auth-input-group {
+    margin-bottom: 20px;
+  }
+
+  .auth-input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark-color);
+  }
+
+  .auth-input-group input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .auth-input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  .auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .remember-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .remember-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+  }
+
+  .forgot-link {
+    color: var(--primary-color);
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .forgot-link:hover {
+    color: var(--primary-dark);
+  }
+
+  .auth-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--gradient-1);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .auth-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  }
+
+  .auth-divider {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+  }
+
+  .auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  .auth-divider span {
+    background: white;
+    padding: 0 15px;
+    color: #64748b;
+    position: relative;
+    font-size: 0.875rem;
+  }
+
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+    color: var(--dark-color);
+    text-decoration: none;
+  }
+
+  .social-btn:hover {
+    border-color: var(--primary-color);
+    background: rgba(99, 102, 241, 0.05);
+    color: var(--dark-color);
+  }
+
+  .social-btn.facebook {
+    background: #1877f2;
+    border-color: #1877f2;
+    color: white;
+  }
+
+  .social-btn.facebook:hover {
+    background: #166fe5;
+    color: white;
+  }
+
+  .social-btn img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #64748b;
+  }
+
+  .auth-footer a {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .auth-footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<section class="auth-section">
+  <div class="container">
+    <div class="auth-card" data-aos="fade-up">
+      <div class="auth-header">
+        <h2><i class="fas fa-sign-in-alt me-2"></i>Welcome Back</h2>
+        <p>Sign in to your BuyNest account</p>
+      </div>
+      
+      <div class="auth-body">
+        <form method="POST" action="{% url 'login' %}?next={{ request.GET.next }}">
+          {% csrf_token %}
+          {% include "base/alert.html" %}
+
+          <div class="auth-input-group">
+            <label for="username"><i class="fas fa-user me-2"></i>Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
           </div>
-          <div class="card-body">
-            <form method="POST" action="{% url 'login' %}?next={{ request.GET.next }}">
-              {% csrf_token %} {% include "base/alert.html" %}
 
-              <div class="form-group">
-                <input
-                  class="form-control"
-                  required
-                  placeholder="Username"
-                  name="username"
-                  type="text"
-                  autocomplete="username"
-                />
-              </div>
-              <!-- form-group// -->
-              <div class="form-group">
-                <input
-                  class="form-control"
-                  required
-                  placeholder="Password"
-                  name="password"
-                  type="password"
-                />
-              </div>
-              <!-- form-group// -->
-
-              <div class="form-group">
-                <a href="{% url 'password_reset' %}" class="float-right">
-                  Forgot password?
-                </a>
-                <label class="float-left custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" checked/>
-                  <div class="custom-control-label">Remember</div>
-                </label>
-              </div>
-
-              <!-- form-group// -->
-              <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">
-                  Login
-                </button>
-              </div>
-
-              <p class="text-center mt-4">
-                Don't have account? <a href="{% url 'register' %}">Sign up</a>
-              </p>
-
-              <div class="line"></div>
-
-              <div class="media-options">
-                <a href="{% provider_login_url 'facebook' %}" class="field facebook">
-                  <i class="bx bxl-facebook facebook-icon"></i>
-                  <span>Login with Facebook</span>
-                </a>
-              </div>
-
-              <div class="media-options">
-                <a href="{% provider_login_url 'google' %}?next=/" class="field google">
-                  <img src="{% static 'images/google.png' %}" alt="" class="google-img"/>
-                  <span>Login with Google</span>
-                </a>
-              </div>
-            </form>
+          <div class="auth-input-group">
+            <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
           </div>
-        </div>
+
+          <div class="auth-options">
+            <label class="remember-check">
+              <input type="checkbox" checked>
+              <span>Remember me</span>
+            </label>
+            <a href="{% url 'password_reset' %}" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="auth-btn">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          </button>
+
+          <div class="auth-footer">
+            Don't have an account? <a href="{% url 'register' %}">Sign up for free</a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </section>
-<!-- ============================ COMPONENT LOGIN END ================================= -->
 
 {% endblock %}

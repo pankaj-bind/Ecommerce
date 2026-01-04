@@ -1,33 +1,180 @@
 {% extends 'base/base.html' %}
-{% block title %}Payment Successful!{% endblock %}
+{% block title %}Order Confirmed!{% endblock %}
 {% block start %}
 
-<!-- ============================ COMPONENT Payment Success ================================= -->
-<section class="section-content padding-bottom">
-  <div class="container-xl d-flex justify-content-center align-items-center mt-5">
-    <div class="row justify-content-center w-100">
-      <div class="col-xl-5">
-        <div class="card mb-4">
-          <div class="card-header" style="text-align: center; font-size: 25px">
-            Payment Successful!
-          </div>
-          <div class="card-body text-center">
-            <p>
-              Your order with Order ID: <strong>{{ order_id }} </strong> has
-              been successfully processed.
-            </p>
-            <p>Thank you for shopping with us!</p>
-            <a href="{% url 'index' %}" class="btn btn-primary mt-3 mb-3 mr-3">
-              Continue Shopping
-            </a>
-            <a href="{% url 'order_details' order_id=order_id %}" class="btn btn-warning">
-              View Order Details
-            </a>
-          </div>
+<style>
+  .success-section {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  }
+
+  .success-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+
+  .success-header {
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+    padding: 40px;
+    text-align: center;
+    color: white;
+  }
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
+  }
+
+  .success-header h2 {
+    font-size: 1.75rem;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+  }
+
+  .success-body {
+    padding: 40px;
+    text-align: center;
+  }
+
+  .order-id-box {
+    background: #f0fdfa;
+    border: 2px dashed #0d9488;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+  }
+
+  .order-id-box span {
+    color: #64748b;
+    font-size: 0.875rem;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .order-id-box strong {
+    color: #0d9488;
+    font-size: 1.1rem;
+    font-family: monospace;
+  }
+
+  .success-body p {
+    color: #64748b;
+    margin-bottom: 25px;
+    line-height: 1.7;
+  }
+
+  .cod-notice {
+    background: #fef3c7;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .cod-notice i {
+    color: #f59e0b;
+    font-size: 1.5rem;
+  }
+
+  .cod-notice p {
+    margin: 0;
+    color: #92400e;
+    font-size: 0.9rem;
+  }
+
+  .btn-success-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin: 5px;
+  }
+
+  .btn-primary-success {
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+    color: white;
+  }
+
+  .btn-primary-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+    color: white;
+  }
+
+  .btn-secondary-success {
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+
+  .btn-secondary-success:hover {
+    background: #e2e8f0;
+    color: #0d9488;
+  }
+</style>
+
+<section class="success-section">
+  <div class="container">
+    <div class="success-card" data-aos="fade-up">
+      <div class="success-header">
+        <div class="success-icon">
+          <i class="fas fa-check"></i>
+        </div>
+        <h2>{% if payment_mode == 'COD' %}Order Placed!{% else %}Payment Successful!{% endif %}</h2>
+      </div>
+      <div class="success-body">
+        <div class="order-id-box">
+          <span>Order ID</span>
+          <strong>{{ order_id }}</strong>
+        </div>
+
+        {% if payment_mode == 'COD' %}
+        <div class="cod-notice">
+          <i class="fas fa-money-bill-wave"></i>
+          <p><strong>Cash on Delivery:</strong> Please keep the exact amount ready when the delivery arrives.</p>
+        </div>
+        {% endif %}
+
+        <p>
+          {% if payment_mode == 'COD' %}
+          Your order has been confirmed! Pay ₹{{ order.grand_total }} when you receive your order.
+          {% else %}
+          Your payment has been processed successfully. Thank you for shopping with BuyNest!
+          {% endif %}
+        </p>
+
+        <div class="d-flex flex-wrap justify-content-center">
+          <a href="{% url 'order_details' order_id=order_id %}" class="btn-success-action btn-primary-success">
+            <i class="fas fa-receipt"></i>View Order
+          </a>
+          <a href="{% url 'index' %}" class="btn-success-action btn-secondary-success">
+            <i class="fas fa-shopping-bag"></i>Continue Shopping
+          </a>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- ============================ COMPONENT Payment Success END ================================= -->
+
 {% endblock %}

@@ -1,102 +1,334 @@
 {% extends "base/base.html" %} 
-{% block title %}Profile{% endblock title %}
+{% block title %}My Profile - BuyNest{% endblock title %}
 {% load crispy_forms_tags %} {% load static %} {% block start %}
 
 <style>
-  .img-account-profile {
-    height: 10rem;
+  .profile-section {
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 40px 0 80px;
   }
-  
-  .rounded-circle {
-    border-radius: 50% !important;
+
+  .profile-header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    padding: 60px 0;
+    margin-top: -80px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
   }
-  
-  .card {
-    box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+    top: -100px;
+    right: -100px;
   }
-  
-  .card .card-header {
-    font-weight: 500;
+
+  .profile-header h1 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    position: relative;
+    z-index: 1;
   }
-  
-  .card-header:first-child {
-    border-radius: 0.35rem 0.35rem 0 0;
+
+  .profile-header p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 10px 0 0;
+    position: relative;
+    z-index: 1;
   }
-  
-  .card-header {
-    padding: 1rem 1.35rem;
-    margin-bottom: 0;
-    background-color: rgba(33, 40, 50, 0.03);
-    border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+
+  .profile-nav {
+    background: white;
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    display: inline-flex;
+    gap: 5px;
   }
-  
-  .nav-borders .nav-link.active {
-    color: #0061f2;
-    border-bottom-color: #0061f2;
+
+  .profile-nav .nav-link {
+    padding: 14px 28px;
+    border-radius: 12px;
+    color: #64748b;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  
-  .nav-borders .nav-link {
-    color: #69707a;
-    border-bottom-width: 0.125rem;
-    border-bottom-style: solid;
-    border-bottom-color: transparent;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: 1rem;
-    margin-right: 1rem;
+
+  .profile-nav .nav-link:hover {
+    color: #6366f1;
+    background: #f1f5f9;
+  }
+
+  .profile-nav .nav-link.active {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+  }
+
+  .profile-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    height: 100%;
+    border: 1px solid #f1f5f9;
+  }
+
+  .profile-card-header {
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profile-card-header i {
+    color: #6366f1;
+  }
+
+  .profile-card-body {
+    padding: 30px;
+  }
+
+  .profile-avatar-section {
+    text-align: center;
+    padding: 40px 30px;
+  }
+
+  .profile-avatar-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 25px;
+  }
+
+  .profile-avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+  }
+
+  .avatar-upload-label {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+  }
+
+  .avatar-upload-label:hover {
+    transform: scale(1.1);
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+
+  .profile-email {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    color: #6366f1;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .avatar-hint {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    margin-top: 20px;
+  }
+
+  /* Form Styling */
+  .profile-card-body .form-control,
+  .profile-card-body input[type="text"],
+  .profile-card-body input[type="email"],
+  .profile-card-body textarea {
+    padding: 14px 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+  }
+
+  .profile-card-body .form-control:focus,
+  .profile-card-body input:focus,
+  .profile-card-body textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    background: white;
+  }
+
+  .profile-card-body label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .btn-update-profile {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    padding: 14px 35px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-update-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+    color: white;
+  }
+
+  @media (max-width: 991px) {
+    .profile-nav {
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .profile-nav .nav-link {
+      flex: 1;
+      justify-content: center;
+      padding: 12px 15px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .profile-header {
+      padding: 40px 0;
+    }
+
+    .profile-header h1 {
+      font-size: 1.5rem;
+    }
   }
 </style>
 
-<section class="section-content padding-bottom">
-  <div class="container-xl px-4 mt-4">
-    {% include "base/alert.html" %}
-    <nav class="nav nav-borders">
-      <a class="nav-link active ms-0" href="{% url 'profile' username=user.username %}">Profile</a>
-      <a class="nav-link ms-0" href="{% url 'shipping-address' %}">Address</a>
-      <a class="nav-link ms-0" href="{% url 'change_password' %}">Security</a>
-    </nav>
-    
-    <hr class="mt-0 mb-4" />
+<section class="profile-section">
+  <div class="profile-header">
+    <div class="container">
+      <h1 data-aos="fade-up">My Profile</h1>
+      <p data-aos="fade-up" data-aos-delay="100">Manage your account settings and preferences</p>
+    </div>
+  </div>
 
-    <!-- Profile Picture Section -->
-    <div class="row">
-      <div class="col-xl-4">
-        <div class="card mb-4 mb-xl-0">
-          <div class="card-header">Profile Picture</div>
-          <div class="card-body text-center">
+  <div class="container">
+    {% include "base/alert.html" %}
+    
+    <div class="text-center mb-4" data-aos="fade-up">
+      <nav class="profile-nav">
+        <a class="nav-link active" href="{% url 'profile' username=user.username %}">
+          <i class="fas fa-user"></i>
+          <span>Profile</span>
+        </a>
+        <a class="nav-link" href="{% url 'shipping-address' %}">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Address</span>
+        </a>
+        <a class="nav-link" href="{% url 'change_password' %}">
+          <i class="fas fa-shield-alt"></i>
+          <span>Security</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="row g-4">
+      <!-- Profile Picture Card -->
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <i class="fas fa-camera"></i>
+            Profile Picture
+          </div>
+          <div class="profile-avatar-section">
             <form method="POST" enctype="multipart/form-data">
               {% csrf_token %}
-
-              {% if user.profile.profile_image %}
-              <img class="img-account-profile rounded-circle mb-2"
-                src="{{ user.profile.profile_image.url }}" alt="Profile Picture"/>
-
-              {% else %}
-              <img class="img-account-profile rounded-circle mb-2"
-                src="{% static 'images/default-profile.png' %}"
-                alt="Default Profile Picture"/>
-              {% endif %}
-
-              <div class="small font-italic text-muted mb-4">
-                JPG or PNG no larger than 5 MB
+              <div class="profile-avatar-wrapper">
+                {% if user.profile.profile_image %}
+                <img class="profile-avatar" src="{{ user.profile.profile_image.url }}" alt="Profile Picture">
+                {% else %}
+                <img class="profile-avatar" src="{% static 'images/default-profile.png' %}" alt="Default Profile">
+                {% endif %}
               </div>
+              
+              <h4 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h4>
+              <p class="profile-email">{{ user.email }}</p>
+              
+              <div class="profile-badge">
+                <i class="fas fa-check-circle"></i>
+                Verified Member
+              </div>
+
+              <p class="avatar-hint">
+                <i class="fas fa-info-circle me-1"></i>
+                JPG or PNG, max 5 MB
+              </p>
             </form>
           </div>
         </div>
       </div>
 
-      <!-- Account Details Section -->
-      <div class="col-xl-8">
-        <div class="card mb-4">
-          <div class="card-header">Account Details</div>
-          <div class="card-body">
+      <!-- Account Details Card -->
+      <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <i class="fas fa-user-edit"></i>
+            Account Details
+          </div>
+          <div class="profile-card-body">
             <form method="POST" enctype="multipart/form-data">
-              {% csrf_token %} 
-              {{ user_form|crispy }} 
+              {% csrf_token %}
+              {{ user_form|crispy }}
               {{ profile_form|crispy }}
-              <button class="btn btn-primary" type="submit">
+              <button class="btn-update-profile" type="submit">
+                <i class="fas fa-save"></i>
                 Update Profile
               </button>
             </form>

@@ -1,157 +1,101 @@
 {% load static %}
 
-<style>
-  @media (max-width: 992px) {
-    .widgets-wrap {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: left;
-      flex-wrap: nowrap;
-    }
+<!-- Modern Navbar -->
+<nav class="main-navbar">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap">
+      <!-- Brand Logo -->
+      <a class="navbar-brand" href="{% url 'index' %}">
+        Buy<span>Nest</span>
+      </a>
 
-    .widget-header {
-      margin-right: 10px;
-    }
-
-    .icontext {
-      display: flex;
-      align-items: center;
-    }
-
-    .icontext .text {
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    .text span {
-      display: block;
-    }
-
-    .text div {
-      display: inline;
-    }
-}
-</style>
-
-<header class="section-header">
-  <nav class="navbar navbar-dark navbar-expand-md bg-dark">
-    <div class="container">
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarCollapse"
-        aria-controls="navbarCollapse"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
+      <!-- Mobile Toggle -->
+      <button class="navbar-toggler d-lg-none border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <i class="fas fa-bars fa-lg"></i>
       </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
-          {% if user.is_authenticated %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'wishlist' %}">Wishlist ({{ request.user.wishlist.count }})</a></li>
-          {% else %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a></li>
+
+      <!-- Search Bar (Desktop) -->
+      <div class="search-container d-none d-lg-block">
+        <form method="GET" action="{% url 'product_search' %}">
+          <input type="text" name="q" placeholder="Search for products, brands and more..." value="{{ query|default:'' }}">
+          <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+
+      <!-- Action Icons -->
+      <div class="d-flex align-items-center gap-3">
+        <!-- Wishlist -->
+        <a href="{% url 'wishlist' %}" class="icon-btn d-none d-md-flex" title="Wishlist">
+          <i class="far fa-heart"></i>
+          {% if user.is_authenticated and request.user.wishlist.count > 0 %}
+            <span class="badge">{{ request.user.wishlist.count }}</span>
           {% endif %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'order_history' %}">Your Orders</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact Us</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About Us</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+        </a>
 
-  <section class="header-main border-bottom">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-2 col-4">
-          <div class="brand-wrap">
-            <a href="{% url 'index' %}">
-              <img class="logo" src="{% static 'images/logo.png' %}" />
+        <!-- Cart -->
+        <a href="{% url 'cart' %}" class="icon-btn" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          {% if user.is_authenticated %}
+            <span class="badge">{{ request.user.profile.get_cart_count }}</span>
+          {% endif %}
+        </a>
+
+        <!-- User Profile/Login -->
+        {% if user.is_authenticated %}
+          <div class="dropdown user-dropdown">
+            <a href="#" class="d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if user.profile.profile_image %}
+                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="user-avatar">
+              {% else %}
+                <div class="icon-btn">
+                  <i class="fas fa-user"></i>
+                </div>
+              {% endif %}
             </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 border-bottom">
+                <div class="fw-semibold">{{ user.get_full_name|default:user.username }}</div>
+                <small class="text-muted">{{ user.email }}</small>
+              </li>
+              <li><a class="dropdown-item" href="{% url 'profile' username=user.username %}"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fas fa-box me-2"></i>My Orders</a></li>
+              <li><a class="dropdown-item" href="{% url 'wishlist' %}"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
+              <li><a class="dropdown-item" href="{% url 'shipping-address' %}"><i class="fas fa-map-marker-alt me-2"></i>Addresses</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
           </div>
-        </div>
-        <div class="col-lg-6 col-sm-12">
-          <form method="GET" action="{% url 'product_search' %}" class="search">
-            <div class="input-group w-100">
-              <input type="text" class="form-control" name="q"
-              placeholder="Search" value="{{ query|default:"" }}"/>
-              <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <div class="col-lg-4 col-sm-6 col-8">
-          <div class="widgets-wrap float-md-right">
-
-            <!-- Cart Icon with badge -->
-            <div class="widget-header mr-3">
-              <a href="{% url 'cart' %}" class="icon icon-sm rounded-circle border">
-                <i class="fa fa-shopping-cart"></i>
-              </a>
-              {% if user.is_authenticated %}
-                <span class="badge badge-pill badge-danger notify">
-                  {{request.user.profile.get_cart_count}}
-                </span>
-              {% else %}
-                <span class="badge badge-pill badge-danger notify"></span>
-              {% endif %}
-            </div>
-
-            <!-- Profile Icon -->
-            <div class="widget-header icontext">
-              {% if user.is_authenticated %}
-                {% if user.profile.profile_image %}
-                  <a href="{% url 'profile' username=user.username %}" 
-                  class="icon icon-sm rounded-circle border">
-                    <img
-                      src="{{ user.profile.profile_image.url }}"
-                      alt="Profile Image"
-                      class="rounded-circle"
-                      width="42"
-                      height="42"
-                    />
-                  </a>
-                {% else %}
-                  <a
-                    href="{% url 'profile' username=user.username %}"
-                    class="icon icon-sm rounded-circle border">
-                    <i class="fa fa-user"></i>
-                  </a>
-                {% endif %}
-              {% else %}
-                <a href="{% url 'login' %}" class="icon icon-sm rounded-circle border">
-                  <i class="fa fa-user"></i>
-                </a>
-              {% endif %}
-
-              <!-- Welcome Text and Logout Link -->
-              <div class="text">
-                {% if request.user.is_authenticated %}
-                <span class="text-muted">Welcome, {{ request.user }}!</span>
-                <div>
-                  <a href="{% url 'logout' %}">Logout</a>
-                </div>
-                {% else %}
-                <span class="text-muted">Welcome</span>
-                <div>
-                  <a href="{% url 'login' %}">Sign in</a> |
-                  <a href="{% url 'register' %}">Register</a>
-                </div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary-custom d-none d-md-block">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          </a>
+          <a href="{% url 'login' %}" class="icon-btn d-md-none">
+            <i class="fas fa-sign-in-alt"></i>
+          </a>
+        {% endif %}
       </div>
     </div>
-  </section>
-</header>
+
+    <!-- Collapsible Navigation -->
+    <div class="collapse" id="mainNav">
+      <!-- Mobile Search -->
+      <div class="search-container my-3 d-lg-none">
+        <form method="GET" action="{% url 'product_search' %}">
+          <input type="text" name="q" placeholder="Search products..." value="{{ query|default:'' }}">
+          <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+
+      <!-- Navigation Links -->
+      <ul class="navbar-nav flex-row flex-wrap justify-content-center gap-1 py-3">
+        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'get_product' 'men' %}"><i class="fas fa-male me-1"></i>Men</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'get_product' 'women' %}"><i class="fas fa-female me-1"></i>Women</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'get_product' 'kids' %}"><i class="fas fa-child me-1"></i>Kids</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'order_history' %}"><i class="fas fa-box me-1"></i>Orders</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}"><i class="fas fa-info-circle me-1"></i>About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

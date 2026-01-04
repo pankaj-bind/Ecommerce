@@ -1,14 +1,51 @@
-
 {% if messages %}
 {% for message in messages %}
-
-<div class="alert alert-dismissible alert-{% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
-
-    {{message}}
-
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<div class="alert alert-dismissible fade show 
+    {% if message.tags == 'success' %}alert-success-custom
+    {% elif message.tags == 'error' or message.tags == 'danger' %}alert-danger-custom
+    {% elif message.tags == 'warning' %}alert-warning-custom
+    {% else %}alert-custom{% endif %}" 
+    role="alert" style="
+        border: none;
+        border-radius: 15px;
+        padding: 15px 25px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        {% if message.tags == 'success' %}
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        border-left: 4px solid #10b981;
+        {% elif message.tags == 'error' or message.tags == 'danger' %}
+        background: rgba(244, 63, 94, 0.1);
+        color: #dc2626;
+        border-left: 4px solid #f43f5e;
+        {% elif message.tags == 'warning' %}
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+        border-left: 4px solid #f59e0b;
+        {% else %}
+        background: rgba(99, 102, 241, 0.1);
+        color: #4f46e5;
+        border-left: 4px solid #6366f1;
+        {% endif %}
+    ">
+    <i class="fas 
+        {% if message.tags == 'success' %}fa-check-circle
+        {% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle
+        {% elif message.tags == 'warning' %}fa-exclamation-triangle
+        {% else %}fa-info-circle{% endif %}" 
+        style="font-size: 1.25rem;"></i>
+    <span style="flex: 1;">{{ message }}</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: opacity 0.3s;
+    ">&times;</button>
 </div>
-
-{% endfor %} {% endif %}
+{% endfor %}
+{% endif %}
