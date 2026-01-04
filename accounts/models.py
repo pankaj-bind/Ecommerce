@@ -14,6 +14,8 @@ class Profile(BaseModel):
         User, on_delete=models.CASCADE, related_name="profile")
     is_email_verified = models.BooleanField(default=False)
     email_token = models.CharField(max_length=100, null=True, blank=True)
+    otp = models.CharField(max_length=6, null=True, blank=True)
+    otp_created_at = models.DateTimeField(null=True, blank=True)
     profile_image = models.ImageField(upload_to='profile', null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.CASCADE, related_name="shipping_address", null=True, blank=True)

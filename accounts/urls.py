@@ -8,6 +8,8 @@ urlpatterns = [
     path('register/', register_page, name="register"),
     path('logout/', user_logout, name='logout'),
     path('activate/<email_token>/', activate_email_account, name="activate_email"),
+    path('verify-otp/<str:email>/', verify_otp, name="verify_otp"),
+    path('resend-otp/<str:email>/', resend_otp, name="resend_otp"),
     
     #Profile management urls with profile, change-password, and shipping-address
     path('profile/<str:username>/', profile_view, name='profile'),

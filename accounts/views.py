@@ -1,5 +1,6 @@
 import os, json
 import uuid
+import random
 import razorpay
 # from weasyprint import CSS, HTML  # Commented out - requires GTK libraries on Windows
 from products.models import *
@@ -11,7 +12,7 @@ from home.models import ShippingAddress
 from django.contrib.auth.models import User
 from django.template.loader import get_template
 from accounts.models import Profile, Cart, CartItem, Order, OrderItem
-from base.emails import send_account_activation_email
+from base.emails import send_account_activation_email, send_otp_email
 from django.views.decorators.http import require_POST
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -20,6 +21,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import redirect, render, get_object_or_404
 from accounts.forms import UserUpdateForm, UserProfileForm, ShippingAddressForm, CustomPasswordChangeForm
+from django.utils import timezone
+from datetime import timedelta
 
 
 # Create your views here.
@@ -28,24 +31,26 @@ from accounts.forms import UserUpdateForm, UserProfileForm, ShippingAddressForm,
 def login_page(request):
     next_url = request.GET.get('next')  # Default to 'index' if 'next' is not provided
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user_obj = User.objects.filter(username=username)
+        
+        # Find user by email
+        user_obj = User.objects.filter(email=email)
 
         if not user_obj.exists():
             messages.warning(request, 'Account not found!')
             return HttpResponseRedirect(request.path_info)
 
-        # Auto-verify email for easier testing (remove in production)
+        # Check if email is verified
         if not user_obj[0].profile.is_email_verified:
-            user_obj[0].profile.is_email_verified = True
-            user_obj[0].profile.save()
+            messages.warning(request, 'Please verify your email first!')
+            return redirect('verify_otp', email=email)
 
         # then authenticate user
-        user_obj = authenticate(username=username, password=password)
-        if user_obj:
-            login(request, user_obj)
-            messages.success(request, 'Login Successfull.')
+        user = authenticate(username=user_obj[0].username, password=password)
+        if user:
+            login(request, user)
+            messages.success(request, 'Login Successful.')
             
             # Check if the next URL is safe
             if url_has_allowed_host_and_scheme(url=next_url, allowed_hosts=request.get_host()):
@@ -59,33 +64,117 @@ def login_page(request):
     return render(request, 'accounts/login.html')
 
 
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+
 def register_page(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        user_obj = User.objects.filter(username=username, email=email)
-
-        if user_obj.exists():
-            messages.info(request, 'Username or email already exists!')
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            messages.info(request, 'Email already exists!')
             return HttpResponseRedirect(request.path_info)
 
-        # if user not registered
+        # Create username from email (before @)
+        username = email.split('@')[0]
+        # Ensure unique username
+        base_username = username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        # Create user
         user_obj = User.objects.create(
             username=username, first_name=first_name, last_name=last_name, email=email)
         user_obj.set_password(password)
         user_obj.save()
 
+        # Generate OTP
+        otp = generate_otp()
         profile = Profile.objects.get(user=user_obj)
-        profile.email_token = str(uuid.uuid4())
+        profile.otp = otp
+        profile.otp_created_at = timezone.now()
         profile.save()
 
-        send_account_activation_email(email, profile.email_token)
-        messages.success(request, "An email has been sent to your mail.")
-        return HttpResponseRedirect(request.path_info)
+        # Send OTP email
+        try:
+            send_otp_email(email, otp, first_name)
+            messages.success(request, "OTP sent to your email. Please verify.")
+            return redirect('verify_otp', email=email)
+        except Exception as e:
+            messages.warning(request, f"Error sending email. Please try again.")
+            return HttpResponseRedirect(request.path_info)
+
+    return render(request, 'accounts/register.html')
+
+
+def verify_otp(request, email):
+    try:
+        user = User.objects.get(email=email)
+        profile = user.profile
+    except User.DoesNotExist:
+        messages.error(request, 'User not found!')
+        return redirect('register')
+
+    if profile.is_email_verified:
+        messages.info(request, 'Email already verified. Please login.')
+        return redirect('login')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        
+        # Check if OTP is expired (10 minutes)
+        if profile.otp_created_at:
+            time_diff = timezone.now() - profile.otp_created_at
+            if time_diff > timedelta(minutes=10):
+                messages.error(request, 'OTP has expired. Please request a new one.')
+                return HttpResponseRedirect(request.path_info)
+        
+        if profile.otp == entered_otp:
+            profile.is_email_verified = True
+            profile.otp = None
+            profile.otp_created_at = None
+            profile.save()
+            messages.success(request, 'Email verified successfully! Please login.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Invalid OTP. Please try again.')
+            return HttpResponseRedirect(request.path_info)
+
+    return render(request, 'accounts/verify_otp.html', {'email': email})
+
+
+def resend_otp(request, email):
+    try:
+        user = User.objects.get(email=email)
+        profile = user.profile
+    except User.DoesNotExist:
+        messages.error(request, 'User not found!')
+        return redirect('register')
+
+    if profile.is_email_verified:
+        messages.info(request, 'Email already verified.')
+        return redirect('login')
+
+    # Generate new OTP
+    otp = generate_otp()
+    profile.otp = otp
+    profile.otp_created_at = timezone.now()
+    profile.save()
+
+    try:
+        send_otp_email(email, otp, user.first_name)
+        messages.success(request, 'New OTP sent to your email.')
+    except Exception as e:
+        messages.error(request, 'Error sending OTP. Please try again.')
+
+    return redirect('verify_otp', email=email)
 
     return render(request, 'accounts/register.html')
 
