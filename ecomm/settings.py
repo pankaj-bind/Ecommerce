@@ -215,6 +215,11 @@ EMAIL_USE_SSL = False
 RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
 RAZORPAY_SECRET_KEY = config('RAZORPAY_SECRET_KEY')
 
+# Twilio Settings for SMS OTP
+TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER')
+
 # Auth Backends Configurations
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",

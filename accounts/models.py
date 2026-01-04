@@ -14,6 +14,8 @@ class Profile(BaseModel):
         User, on_delete=models.CASCADE, related_name="profile")
     is_email_verified = models.BooleanField(default=False)
     email_token = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    is_phone_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=6, null=True, blank=True)
     otp_created_at = models.DateTimeField(null=True, blank=True)
     profile_image = models.ImageField(upload_to='profile', null=True, blank=True)
