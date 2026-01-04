@@ -1,6 +1,5 @@
 import os, json
 import uuid
-import random
 import razorpay
 # from weasyprint import CSS, HTML  # Commented out - requires GTK libraries on Windows
 from products.models import *
@@ -12,7 +11,6 @@ from home.models import ShippingAddress
 from django.contrib.auth.models import User
 from django.template.loader import get_template
 from accounts.models import Profile, Cart, CartItem, Order, OrderItem
-from base.emails import send_account_activation_email, send_otp_email, send_otp_sms
 from django.views.decorators.http import require_POST
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -21,15 +19,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import redirect, render, get_object_or_404
 from accounts.forms import UserUpdateForm, UserProfileForm, ShippingAddressForm, CustomPasswordChangeForm
-from django.utils import timezone
-from datetime import timedelta
 
 
 # Create your views here.
 
 
 def login_page(request):
-    next_url = request.GET.get('next')  # Default to 'index' if 'next' is not provided
+    next_url = request.GET.get('next')
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -41,12 +37,7 @@ def login_page(request):
             messages.warning(request, 'Account not found!')
             return HttpResponseRedirect(request.path_info)
 
-        # Check if phone is verified
-        if not user_obj[0].profile.is_phone_verified:
-            messages.warning(request, 'Please verify your phone number first!')
-            return redirect('verify_otp', phone=user_obj[0].profile.phone_number)
-
-        # then authenticate user
+        # Authenticate user
         user = authenticate(username=user_obj[0].username, password=password)
         if user:
             login(request, user)
@@ -64,30 +55,16 @@ def login_page(request):
     return render(request, 'accounts/login.html')
 
 
-def generate_otp():
-    return str(random.randint(100000, 999999))
-
-
 def register_page(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
         password = request.POST.get('password')
-
-        # Validate phone number format
-        if not phone_number.startswith('+'):
-            phone_number = '+91' + phone_number  # Default to India country code
 
         # Check if email already exists
         if User.objects.filter(email=email).exists():
             messages.info(request, 'Email already exists!')
-            return HttpResponseRedirect(request.path_info)
-
-        # Check if phone number already exists
-        if Profile.objects.filter(phone_number=phone_number).exists():
-            messages.info(request, 'Phone number already registered!')
             return HttpResponseRedirect(request.path_info)
 
         # Create username from email (before @)
@@ -105,88 +82,10 @@ def register_page(request):
         user_obj.set_password(password)
         user_obj.save()
 
-        # Generate OTP
-        otp = generate_otp()
-        profile = Profile.objects.get(user=user_obj)
-        profile.phone_number = phone_number
-        profile.otp = otp
-        profile.otp_created_at = timezone.now()
-        profile.save()
-
-        # Send OTP via SMS
-        success, result = send_otp_sms(phone_number, otp)
-        if success:
-            messages.success(request, "OTP sent to your phone. Please verify.")
-            return redirect('verify_otp', phone=phone_number)
-        else:
-            messages.warning(request, f"Error sending SMS: {result}")
-            return HttpResponseRedirect(request.path_info)
+        messages.success(request, "Account created successfully! Please login.")
+        return redirect('login')
 
     return render(request, 'accounts/register.html')
-
-
-def verify_otp(request, phone):
-    try:
-        profile = Profile.objects.get(phone_number=phone)
-        user = profile.user
-    except Profile.DoesNotExist:
-        messages.error(request, 'User not found!')
-        return redirect('register')
-
-    if profile.is_phone_verified:
-        messages.info(request, 'Phone already verified. Please login.')
-        return redirect('login')
-
-    if request.method == 'POST':
-        entered_otp = request.POST.get('otp')
-        
-        # Check if OTP is expired (10 minutes)
-        if profile.otp_created_at:
-            time_diff = timezone.now() - profile.otp_created_at
-            if time_diff > timedelta(minutes=10):
-                messages.error(request, 'OTP has expired. Please request a new one.')
-                return HttpResponseRedirect(request.path_info)
-        
-        if profile.otp == entered_otp:
-            profile.is_phone_verified = True
-            profile.is_email_verified = True  # Also mark email as verified
-            profile.otp = None
-            profile.otp_created_at = None
-            profile.save()
-            messages.success(request, 'Phone verified successfully! Please login.')
-            return redirect('login')
-        else:
-            messages.error(request, 'Invalid OTP. Please try again.')
-            return HttpResponseRedirect(request.path_info)
-
-    return render(request, 'accounts/verify_otp.html', {'phone': phone})
-
-
-def resend_otp(request, phone):
-    try:
-        profile = Profile.objects.get(phone_number=phone)
-        user = profile.user
-    except Profile.DoesNotExist:
-        messages.error(request, 'User not found!')
-        return redirect('register')
-
-    if profile.is_phone_verified:
-        messages.info(request, 'Phone already verified.')
-        return redirect('login')
-
-    # Generate new OTP
-    otp = generate_otp()
-    profile.otp = otp
-    profile.otp_created_at = timezone.now()
-    profile.save()
-
-    success, result = send_otp_sms(phone, otp)
-    if success:
-        messages.success(request, 'New OTP sent to your phone.')
-    else:
-        messages.error(request, f'Error sending OTP: {result}')
-
-    return redirect('verify_otp', phone=phone)
 
 
 @login_required
