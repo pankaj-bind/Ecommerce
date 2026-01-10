@@ -37,6 +37,12 @@ pip install -r requirements.txt
 ```
 
 ### Step 5: Set Up Environment Variables
+
+**Generate a new SECRET_KEY first:**
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
 Create a `.env` file in your project directory:
 
 ```bash
