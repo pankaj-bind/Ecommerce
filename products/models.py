@@ -10,7 +10,17 @@ from django.contrib.auth.models import User
 class Category(BaseModel):
     category_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, null=True, blank=True)
-    category_image = models.ImageField(upload_to="catgories")
+    category_image = models.ImageField(upload_to="catgories", blank=True, null=True)
+    category_image_url = models.URLField(max_length=500, blank=True, null=True,
+                                         help_text="Enter image URL if not uploading a file")
+
+    def get_image_url(self):
+        """Returns the image URL - either from uploaded file or external URL"""
+        if self.category_image:
+            return self.category_image.url
+        elif self.category_image_url:
+            return self.category_image_url
+        return None
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.category_name)
@@ -70,10 +80,23 @@ class Product(BaseModel):
 class ProductImage(BaseModel):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='product_images')
-    image = models.ImageField(upload_to='product')
+    image = models.ImageField(upload_to='product', blank=True, null=True)
+    image_url = models.URLField(max_length=500, blank=True, null=True, 
+                                help_text="Enter image URL if not uploading a file")
+
+    def get_image_url(self):
+        """Returns the image URL - either from uploaded file or external URL"""
+        if self.image:
+            return self.image.url
+        elif self.image_url:
+            return self.image_url
+        return None
 
     def img_preview(self):
-        return mark_safe(f'<img src="{self.image.url}" width="500"/>')
+        url = self.get_image_url()
+        if url:
+            return mark_safe(f'<img src="{url}" width="500"/>')
+        return "No Image"
 
 
 class Coupon(BaseModel):

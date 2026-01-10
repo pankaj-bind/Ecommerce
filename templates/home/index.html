@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% block title %}BuyNest - Your Shopping Nest{% endblock %}
+{% block title %}BuyNest - Premium Footwear Store{% endblock %}
 {% block start %}
 {% load static %}
 
@@ -471,20 +471,20 @@
       </div>
       <div class="col-6 col-md-3">
         <div class="feature-item">
-          <i class="fas fa-undo-alt"></i>
-          <span>Easy Returns</span>
+          <i class="fas fa-sync-alt"></i>
+          <span>7 Day Exchange</span>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="feature-item">
-          <i class="fas fa-money-bill-wave"></i>
-          <span>Cash on Delivery</span>
+          <i class="fas fa-certificate"></i>
+          <span>100% Original</span>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="feature-item">
-          <i class="fas fa-headset"></i>
-          <span>24/7 Support</span>
+          <i class="fas fa-shield-alt"></i>
+          <span>Secure Payment</span>
         </div>
       </div>
     </div>
@@ -499,21 +499,21 @@
     <!-- Products Header -->
     <div class="products-header" data-aos="fade-up">
       <div class="products-title">
-        <h2>{% if selected_category %}{{ selected_category }}{% else %}All Products{% endif %}</h2>
-        <p>Discover our amazing collection</p>
+        <h2>{% if selected_category %}{{ selected_category }} Shoes{% else %}All Footwear{% endif %}</h2>
+        <p>Step into style with our premium collection</p>
       </div>
       
       <!-- Filter Pills -->
       <div class="filter-pills">
-        <a href="{% url 'index' %}" class="filter-pill {% if not selected_category and not selected_sort %}active{% endif %}">All</a>
+        <a href="{% url 'index' %}" class="filter-pill {% if not selected_category and not selected_sort %}active{% endif %}">All Shoes</a>
         {% for category in categories %}
         <a href="?category={{ category.category_name }}" class="filter-pill {% if selected_category == category.category_name %}active{% endif %}">
           {{ category.category_name }}
         </a>
         {% endfor %}
-        <a href="?sort=newest" class="filter-pill {% if selected_sort == 'newest' %}active{% endif %}">🆕 New</a>
-        <a href="?sort=priceAsc" class="filter-pill {% if selected_sort == 'priceAsc' %}active{% endif %}">💰 Low-High</a>
-        <a href="?sort=priceDesc" class="filter-pill {% if selected_sort == 'priceDesc' %}active{% endif %}">💎 High-Low</a>
+        <a href="?sort=newest" class="filter-pill {% if selected_sort == 'newest' %}active{% endif %}">🆕 New Arrivals</a>
+        <a href="?sort=priceAsc" class="filter-pill {% if selected_sort == 'priceAsc' %}active{% endif %}">💰 Budget Friendly</a>
+        <a href="?sort=priceDesc" class="filter-pill {% if selected_sort == 'priceDesc' %}active{% endif %}">💎 Premium</a>
       </div>
     </div>
 
@@ -537,7 +537,15 @@
 
         <div class="product-image-wrapper">
           <a href="{% url 'get_product' product.slug %}">
-            <img src="/media/{{ product.product_images.first.image }}" alt="{{ product.product_name }}">
+            {% with first_img=product.product_images.first %}
+              {% if first_img.image %}
+                <img src="{{ first_img.image.url }}" alt="{{ product.product_name }}">
+              {% elif first_img.image_url %}
+                <img src="{{ first_img.image_url }}" alt="{{ product.product_name }}">
+              {% else %}
+                <img src="{% static 'images/no-image.png' %}" alt="{{ product.product_name }}">
+              {% endif %}
+            {% endwith %}
           </a>
         </div>
 
@@ -603,31 +611,17 @@
     {% else %}
     <!-- Empty State -->
     <div class="empty-state" data-aos="fade-up">
-      <i class="fas fa-box-open"></i>
-      <h3>No Products Found</h3>
-      <p>We couldn't find any products matching your criteria.</p>
+      <i class="fas fa-shoe-prints"></i>
+      <h3>No Shoes Found</h3>
+      <p>We couldn't find any footwear matching your criteria.</p>
       <a href="{% url 'index' %}" class="btn-reset">
-        <i class="fas fa-redo"></i>Reset Filters
+        <i class="fas fa-redo"></i>Browse All Shoes
       </a>
     </div>
     {% endif %}
   </div>
 </section>
 
-<!-- Promo Banner -->
-<section class="promo-banner">
-  <div class="container">
-    <div class="promo-content" data-aos="fade-up">
-      <div class="promo-text">
-        <h3>🎉 Get 50% OFF on First Order!</h3>
-        <p>Use code <strong>NEW50</strong> at checkout. Limited time offer!</p>
-      </div>
-      <a href="{% url 'register' %}" class="btn-promo">
-        <i class="fas fa-user-plus"></i>
-        Create Account
-      </a>
-    </div>
-  </div>
-</section>
+
 
 {% endblock %}

@@ -1,29 +1,31 @@
 {% load static %}
 
-<!-- Modern Navbar -->
+
+
+<!-- Main Navbar -->
 <nav class="main-navbar">
   <div class="container">
-    <div class="d-flex align-items-center justify-content-between flex-wrap">
+    <div class="navbar-top d-flex align-items-center justify-content-between">
       <!-- Brand Logo -->
       <a class="navbar-brand" href="{% url 'index' %}">
-        Buy<span>Nest</span>
+        <i class="fas fa-shoe-prints me-2" style="color: var(--accent-color);"></i>Buy<span>Nest</span>
       </a>
 
-      <!-- Mobile Toggle -->
-      <button class="navbar-toggler d-lg-none border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-        <i class="fas fa-bars fa-lg"></i>
-      </button>
-
-      <!-- Search Bar (Desktop) -->
+      <!-- Search Bar -->
       <div class="search-container d-none d-lg-block">
         <form method="GET" action="{% url 'product_search' %}">
-          <input type="text" name="q" placeholder="Search for products, brands and more..." value="{{ query|default:'' }}">
+          <input type="text" name="q" placeholder="Search for sneakers, boots, heels and more..." value="{{ query|default:'' }}">
           <button type="submit"><i class="fas fa-search"></i></button>
         </form>
       </div>
 
       <!-- Action Icons -->
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2">
+        <!-- Mobile Search Toggle -->
+        <button class="icon-btn d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch">
+          <i class="fas fa-search"></i>
+        </button>
+
         <!-- Wishlist -->
         <a href="{% url 'wishlist' %}" class="icon-btn d-none d-md-flex" title="Wishlist">
           <i class="far fa-heart"></i>
@@ -43,31 +45,32 @@
         <!-- User Profile/Login -->
         {% if user.is_authenticated %}
           <div class="dropdown user-dropdown">
-            <a href="#" class="d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
+            <a href="#" class="icon-btn" data-bs-toggle="dropdown" aria-expanded="false">
               {% if user.profile.profile_image %}
-                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="user-avatar">
+                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="user-avatar-small">
               {% else %}
-                <div class="icon-btn">
-                  <i class="fas fa-user"></i>
-                </div>
+                <i class="fas fa-user"></i>
               {% endif %}
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li class="px-3 py-2 border-bottom">
-                <div class="fw-semibold">{{ user.get_full_name|default:user.username }}</div>
-                <small class="text-muted">{{ user.email }}</small>
+            <ul class="dropdown-menu dropdown-menu-end user-menu">
+              <li class="dropdown-header">
+                <div class="user-info">
+                  <strong>{{ user.get_full_name|default:user.username }}</strong>
+                  <span>{{ user.email }}</span>
+                </div>
               </li>
-              <li><a class="dropdown-item" href="{% url 'profile' username=user.username %}"><i class="fas fa-user me-2"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fas fa-box me-2"></i>My Orders</a></li>
-              <li><a class="dropdown-item" href="{% url 'wishlist' %}"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
-              <li><a class="dropdown-item" href="{% url 'shipping-address' %}"><i class="fas fa-map-marker-alt me-2"></i>Addresses</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item" href="{% url 'profile' username=user.username %}"><i class="fas fa-user"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fas fa-box"></i>My Orders</a></li>
+              <li><a class="dropdown-item" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i>Wishlist</a></li>
+              <li><a class="dropdown-item" href="{% url 'shipping-address' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item logout-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
             </ul>
           </div>
         {% else %}
-          <a href="{% url 'login' %}" class="btn btn-primary-custom d-none d-md-block">
-            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+          <a href="{% url 'login' %}" class="btn-login d-none d-md-flex">
+            <i class="fas fa-user me-2"></i>Login
           </a>
           <a href="{% url 'login' %}" class="icon-btn d-md-none">
             <i class="fas fa-sign-in-alt"></i>
@@ -76,26 +79,348 @@
       </div>
     </div>
 
-    <!-- Collapsible Navigation -->
-    <div class="collapse" id="mainNav">
-      <!-- Mobile Search -->
-      <div class="search-container my-3 d-lg-none">
+    <!-- Mobile Search -->
+    <div class="collapse" id="mobileSearch">
+      <div class="search-container my-3">
         <form method="GET" action="{% url 'product_search' %}">
-          <input type="text" name="q" placeholder="Search products..." value="{{ query|default:'' }}">
+          <input type="text" name="q" placeholder="Search shoes..." value="{{ query|default:'' }}">
           <button type="submit"><i class="fas fa-search"></i></button>
         </form>
       </div>
-
-      <!-- Navigation Links -->
-      <ul class="navbar-nav flex-row flex-wrap justify-content-center gap-1 py-3">
-        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><i class="fas fa-home me-1"></i>Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'get_product' 'men' %}"><i class="fas fa-male me-1"></i>Men</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'get_product' 'women' %}"><i class="fas fa-female me-1"></i>Women</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'get_product' 'kids' %}"><i class="fas fa-child me-1"></i>Kids</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'order_history' %}"><i class="fas fa-box me-1"></i>Orders</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"><i class="fas fa-envelope me-1"></i>Contact</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}"><i class="fas fa-info-circle me-1"></i>About</a></li>
-      </ul>
     </div>
   </div>
 </nav>
+
+<!-- Category Mega Menu Bar -->
+<div class="category-bar">
+  <div class="container">
+    <ul class="category-nav">
+      <li class="category-item has-mega-menu">
+        <a href="#" class="category-link">
+          <i class="fas fa-th me-2"></i>All Shoes
+          <i class="fas fa-chevron-down ms-2"></i>
+        </a>
+        <div class="mega-menu">
+          <div class="mega-menu-inner">
+            <div class="mega-column">
+              <h4><i class="fas fa-male me-2"></i>Men's Shoes</h4>
+              <ul>
+                <li><a href="{% url 'get_product' 'men' %}">Sneakers</a></li>
+                <li><a href="{% url 'get_product' 'men' %}">Running Shoes</a></li>
+                <li><a href="{% url 'get_product' 'men' %}">Casual Shoes</a></li>
+                <li><a href="{% url 'get_product' 'men' %}">Formal Shoes</a></li>
+                <li><a href="{% url 'get_product' 'men' %}">Loafers</a></li>
+                <li><a href="{% url 'get_product' 'men' %}">Boots</a></li>
+                <li><a href="{% url 'get_product' 'men' %}">Sandals & Slippers</a></li>
+              </ul>
+            </div>
+            <div class="mega-column">
+              <h4><i class="fas fa-female me-2"></i>Women's Shoes</h4>
+              <ul>
+                <li><a href="{% url 'get_product' 'women' %}">Heels</a></li>
+                <li><a href="{% url 'get_product' 'women' %}">Flats</a></li>
+                <li><a href="{% url 'get_product' 'women' %}">Sneakers</a></li>
+                <li><a href="{% url 'get_product' 'women' %}">Wedges</a></li>
+                <li><a href="{% url 'get_product' 'women' %}">Sandals</a></li>
+                <li><a href="{% url 'get_product' 'women' %}">Boots</a></li>
+                <li><a href="{% url 'get_product' 'women' %}">Ballerinas</a></li>
+              </ul>
+            </div>
+            <div class="mega-column">
+              <h4><i class="fas fa-child me-2"></i>Kids' Shoes</h4>
+              <ul>
+                <li><a href="{% url 'get_product' 'kids' %}">Boys Sneakers</a></li>
+                <li><a href="{% url 'get_product' 'kids' %}">Girls Sneakers</a></li>
+                <li><a href="{% url 'get_product' 'kids' %}">School Shoes</a></li>
+                <li><a href="{% url 'get_product' 'kids' %}">Sports Shoes</a></li>
+                <li><a href="{% url 'get_product' 'kids' %}">Sandals</a></li>
+                <li><a href="{% url 'get_product' 'kids' %}">Casual Shoes</a></li>
+              </ul>
+            </div>
+            <div class="mega-column">
+              <h4><i class="fas fa-running me-2"></i>Sports Shoes</h4>
+              <ul>
+                <li><a href="{% url 'index' %}">Running</a></li>
+                <li><a href="{% url 'index' %}">Basketball</a></li>
+                <li><a href="{% url 'index' %}">Football</a></li>
+                <li><a href="{% url 'index' %}">Tennis</a></li>
+                <li><a href="{% url 'index' %}">Training</a></li>
+                <li><a href="{% url 'index' %}">Hiking</a></li>
+              </ul>
+            </div>
+            <div class="mega-column">
+              <h4><i class="fas fa-star me-2"></i>Top Brands</h4>
+              <ul>
+                <li><a href="{% url 'index' %}">Nike</a></li>
+                <li><a href="{% url 'index' %}">Adidas</a></li>
+                <li><a href="{% url 'index' %}">Puma</a></li>
+                <li><a href="{% url 'index' %}">Reebok</a></li>
+                <li><a href="{% url 'index' %}">New Balance</a></li>
+                <li><a href="{% url 'index' %}">Converse</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="category-item">
+        <a href="{% url 'get_product' 'men' %}" class="category-link">
+          <i class="fas fa-male me-1"></i>Men
+        </a>
+      </li>
+      <li class="category-item">
+        <a href="{% url 'get_product' 'women' %}" class="category-link">
+          <i class="fas fa-female me-1"></i>Women
+        </a>
+      </li>
+      <li class="category-item">
+        <a href="{% url 'get_product' 'kids' %}" class="category-link">
+          <i class="fas fa-child me-1"></i>Kids
+        </a>
+      </li>
+      <li class="category-item">
+        <a href="{% url 'index' %}" class="category-link">
+          <i class="fas fa-running me-1"></i>Sports
+        </a>
+      </li>
+      <li class="category-item">
+        <a href="{% url 'index' %}" class="category-link">
+          <i class="fas fa-briefcase me-1"></i>Formal
+        </a>
+      </li>
+      <li class="category-item">
+        <a href="{% url 'index' %}" class="category-link highlight">
+          <i class="fas fa-percent me-1"></i>Sale
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<style>
+/* Category Bar */
+.category-bar {
+  background: #1e3a5f;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.category-nav {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.category-item {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.category-link {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.category-link:hover {
+  color: white;
+  background: rgba(255,255,255,0.1);
+}
+
+.category-link.highlight {
+  color: #fbbf24;
+}
+
+.category-link.highlight:hover {
+  background: rgba(251, 191, 36, 0.15);
+}
+
+/* Mega Menu */
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  min-width: 900px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+  border-radius: 0 0 12px 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.category-item.has-mega-menu:hover .mega-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.mega-menu-inner {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 25px;
+  gap: 30px;
+}
+
+.mega-column h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0d9488;
+}
+
+.mega-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mega-column ul li {
+  margin-bottom: 10px;
+}
+
+.mega-column ul li a {
+  color: #64748b;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  display: block;
+  padding: 4px 0;
+}
+
+.mega-column ul li a:hover {
+  color: #0d9488;
+  padding-left: 8px;
+}
+
+/* User Menu Dropdown */
+.user-menu {
+  min-width: 220px;
+  padding: 0;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.user-menu .dropdown-header {
+  background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+  padding: 15px 20px;
+  color: white;
+}
+
+.user-menu .user-info strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.user-menu .user-info span {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.user-menu .dropdown-item {
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.user-menu .dropdown-item i {
+  width: 18px;
+  color: #64748b;
+}
+
+.user-menu .dropdown-item:hover {
+  background: #f1f5f9;
+  color: #0d9488;
+}
+
+.user-menu .dropdown-item:hover i {
+  color: #0d9488;
+}
+
+.user-menu .logout-item {
+  color: #ef4444;
+}
+
+.user-menu .logout-item i {
+  color: #ef4444;
+}
+
+.user-menu .logout-item:hover {
+  background: #fef2f2;
+}
+
+/* Login Button */
+.btn-login {
+  background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(13, 148, 136, 0.35);
+}
+
+.user-avatar-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+  .category-bar {
+    display: block;
+  }
+
+  .mega-menu {
+    display: none !important;
+  }
+
+  .category-link {
+    padding: 12px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .category-nav {
+    padding: 0 10px;
+  }
+
+  .category-link {
+    padding: 12px 12px;
+  }
+}
+</style>

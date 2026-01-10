@@ -3,136 +3,234 @@
 {% load crispy_forms_tags %} {% load static %} {% block start %}
 
 <style>
-  .profile-section {
-    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  .profile-page {
+    background: #f8fafc;
     min-height: 100vh;
-    padding: 40px 0 80px;
+    padding-bottom: 60px;
   }
 
-  .profile-header {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
-    padding: 60px 0;
-    margin-top: -80px;
-    margin-bottom: 40px;
+  .profile-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0d9488 100%);
+    padding: 80px 0 120px;
     position: relative;
     overflow: hidden;
   }
 
-  .profile-header::before {
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.2) 0%, transparent 70%);
+    top: -200px;
+    right: -100px;
+  }
+
+  .profile-hero::after {
     content: '';
     position: absolute;
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
-    top: -100px;
-    right: -100px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+    bottom: -100px;
+    left: -100px;
   }
 
-  .profile-header h1 {
+  .profile-hero .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-hero h1 {
     color: white;
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    position: relative;
-    z-index: 1;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
   }
 
-  .profile-header p {
-    color: rgba(255, 255, 255, 0.8);
-    margin: 10px 0 0;
-    position: relative;
-    z-index: 1;
+  .profile-hero p {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1rem;
   }
 
-  .profile-nav {
+  .profile-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .profile-breadcrumb a {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    transition: color 0.3s;
+  }
+
+  .profile-breadcrumb a:hover {
+    color: white;
+  }
+
+  .profile-breadcrumb span {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .profile-breadcrumb .current {
+    color: #14b8a6;
+    font-weight: 600;
+  }
+
+  .profile-main {
+    margin-top: -60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Sidebar Navigation */
+  .profile-sidebar {
     background: white;
     border-radius: 16px;
-    padding: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    margin-bottom: 30px;
-    display: inline-flex;
-    gap: 5px;
-  }
-
-  .profile-nav .nav-link {
-    padding: 14px 28px;
-    border-radius: 12px;
-    color: #64748b;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .profile-nav .nav-link:hover {
-    color: #6366f1;
-    background: #f1f5f9;
-  }
-
-  .profile-nav .nav-link.active {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: white;
-  }
-
-  .profile-card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    height: 100%;
-    border: 1px solid #f1f5f9;
+    position: sticky;
+    top: 100px;
   }
 
-  .profile-card-header {
-    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-    padding: 20px 25px;
-    border-bottom: 1px solid #f1f5f9;
-    font-weight: 700;
-    font-size: 1rem;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .profile-card-header i {
-    color: #6366f1;
-  }
-
-  .profile-card-body {
-    padding: 30px;
-  }
-
-  .profile-avatar-section {
+  .sidebar-header {
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+    padding: 25px;
     text-align: center;
-    padding: 40px 30px;
   }
 
-  .profile-avatar-wrapper {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    margin: 0 auto 25px;
-  }
-
-  .profile-avatar {
-    width: 160px;
-    height: 160px;
+  .sidebar-avatar {
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     object-fit: cover;
-    border: 5px solid white;
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 15px;
   }
 
-  .avatar-upload-label {
+  .sidebar-name {
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-email {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+  }
+
+  .sidebar-nav {
+    padding: 15px 0;
+  }
+
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 25px;
+    color: #475569;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .sidebar-nav-item i {
+    width: 20px;
+    color: #94a3b8;
+    transition: color 0.3s;
+  }
+
+  .sidebar-nav-item:hover {
+    background: #f8fafc;
+    color: #0d9488;
+    border-left-color: #0d9488;
+  }
+
+  .sidebar-nav-item:hover i {
+    color: #0d9488;
+  }
+
+  .sidebar-nav-item.active {
+    background: linear-gradient(90deg, rgba(13, 148, 136, 0.1) 0%, transparent 100%);
+    color: #0d9488;
+    border-left-color: #0d9488;
+    font-weight: 600;
+  }
+
+  .sidebar-nav-item.active i {
+    color: #0d9488;
+  }
+
+  /* Content Cards */
+  .profile-content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+
+  .card-header-custom {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-header-custom h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-header-custom h3 i {
+    color: #0d9488;
+  }
+
+  .card-body-custom {
+    padding: 25px;
+  }
+
+  /* Avatar Upload Section */
+  .avatar-upload-section {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+    border-radius: 12px;
+    margin-bottom: 25px;
+  }
+
+  .avatar-preview {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+  }
+
+  .avatar-preview img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 8px 30px rgba(13, 148, 136, 0.2);
+  }
+
+  .avatar-upload-btn {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -140,49 +238,38 @@
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);
+    border: 3px solid white;
   }
 
-  .avatar-upload-label:hover {
+  .avatar-upload-btn:hover {
     transform: scale(1.1);
   }
 
-  .profile-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 8px;
-  }
-
-  .profile-email {
+  .avatar-info {
     color: #64748b;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-  }
-
-  .profile-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-    color: #6366f1;
-    border-radius: 50px;
     font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .avatar-hint {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    margin-top: 20px;
   }
 
   /* Form Styling */
-  .profile-card-body .form-control,
-  .profile-card-body input[type="text"],
-  .profile-card-body input[type="email"],
-  .profile-card-body textarea {
+  .form-group-custom {
+    margin-bottom: 20px;
+  }
+
+  .form-group-custom label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .form-group-custom .form-control,
+  .card-body-custom .form-control,
+  .card-body-custom input[type="text"],
+  .card-body-custom input[type="email"],
+  .card-body-custom textarea {
+    width: 100%;
     padding: 14px 18px;
     border: 2px solid #e5e7eb;
     border-radius: 12px;
@@ -191,25 +278,19 @@
     background: #f9fafb;
   }
 
-  .profile-card-body .form-control:focus,
-  .profile-card-body input:focus,
-  .profile-card-body textarea:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  .card-body-custom .form-control:focus,
+  .card-body-custom input:focus,
+  .card-body-custom textarea:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
     background: white;
+    outline: none;
   }
 
-  .profile-card-body label {
-    font-weight: 600;
-    color: #374151;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-  }
-
-  .btn-update-profile {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  .btn-save-profile {
+    background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
     color: white;
-    padding: 14px 35px;
+    padding: 14px 32px;
     border: none;
     border-radius: 12px;
     font-weight: 700;
@@ -221,122 +302,206 @@
     gap: 10px;
   }
 
-  .btn-update-profile:hover {
+  .btn-save-profile:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 12px 30px rgba(13, 148, 136, 0.35);
     color: white;
   }
 
+  /* Quick Stats */
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .stat-item {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #0d9488;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Mobile Responsiveness */
   @media (max-width: 991px) {
-    .profile-nav {
-      flex-wrap: wrap;
-      width: 100%;
+    .profile-sidebar {
+      margin-bottom: 25px;
+      position: static;
     }
 
-    .profile-nav .nav-link {
-      flex: 1;
-      justify-content: center;
+    .sidebar-nav {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+    }
+
+    .sidebar-nav-item {
+      flex: 1 1 50%;
       padding: 12px 15px;
+      border-left: none;
+      border-bottom: 3px solid transparent;
+      justify-content: center;
+    }
+
+    .sidebar-nav-item.active {
+      border-bottom-color: #0d9488;
+      background: rgba(13, 148, 136, 0.1);
     }
   }
 
   @media (max-width: 767px) {
-    .profile-header {
-      padding: 40px 0;
+    .profile-hero {
+      padding: 60px 0 100px;
     }
 
-    .profile-header h1 {
-      font-size: 1.5rem;
+    .profile-hero h1 {
+      font-size: 1.6rem;
+    }
+
+    .quick-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar-nav-item {
+      flex: 1 1 100%;
     }
   }
 </style>
 
-<section class="profile-section">
-  <div class="profile-header">
+<div class="profile-page">
+  <!-- Hero Section -->
+  <div class="profile-hero">
     <div class="container">
-      <h1 data-aos="fade-up">My Profile</h1>
-      <p data-aos="fade-up" data-aos-delay="100">Manage your account settings and preferences</p>
+      <div class="profile-breadcrumb" data-aos="fade-down">
+        <a href="{% url 'index' %}"><i class="fas fa-home"></i></a>
+        <span>/</span>
+        <span class="current">My Profile</span>
+      </div>
+      <h1 data-aos="fade-up">My Account</h1>
+      <p data-aos="fade-up" data-aos-delay="100">Manage your profile, orders, and preferences</p>
     </div>
   </div>
 
-  <div class="container">
-    {% include "base/alert.html" %}
-    
-    <div class="text-center mb-4" data-aos="fade-up">
-      <nav class="profile-nav">
-        <a class="nav-link active" href="{% url 'profile' username=user.username %}">
-          <i class="fas fa-user"></i>
-          <span>Profile</span>
-        </a>
-        <a class="nav-link" href="{% url 'shipping-address' %}">
-          <i class="fas fa-map-marker-alt"></i>
-          <span>Address</span>
-        </a>
-        <a class="nav-link" href="{% url 'change_password' %}">
-          <i class="fas fa-shield-alt"></i>
-          <span>Security</span>
-        </a>
-      </nav>
-    </div>
-
-    <div class="row g-4">
-      <!-- Profile Picture Card -->
-      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="profile-card">
-          <div class="profile-card-header">
-            <i class="fas fa-camera"></i>
-            Profile Picture
-          </div>
-          <div class="profile-avatar-section">
-            <form method="POST" enctype="multipart/form-data">
-              {% csrf_token %}
-              <div class="profile-avatar-wrapper">
-                {% if user.profile.profile_image %}
-                <img class="profile-avatar" src="{{ user.profile.profile_image.url }}" alt="Profile Picture">
-                {% else %}
-                <img class="profile-avatar" src="{% static 'images/default-profile.png' %}" alt="Default Profile">
-                {% endif %}
-              </div>
-              
-              <h4 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h4>
-              <p class="profile-email">{{ user.email }}</p>
-              
-              <div class="profile-badge">
-                <i class="fas fa-check-circle"></i>
-                Verified Member
-              </div>
-
-              <p class="avatar-hint">
-                <i class="fas fa-info-circle me-1"></i>
-                JPG or PNG, max 5 MB
-              </p>
-            </form>
+  <!-- Main Content -->
+  <div class="profile-main">
+    <div class="container">
+      {% include "base/alert.html" %}
+      
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3" data-aos="fade-up">
+          <div class="profile-sidebar">
+            <div class="sidebar-header">
+              {% if user.profile.profile_image %}
+                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="sidebar-avatar">
+              {% else %}
+                <img src="{% static 'images/default-profile.png' %}" alt="Default" class="sidebar-avatar">
+              {% endif %}
+              <div class="sidebar-name">{{ user.first_name }} {{ user.last_name }}</div>
+              <div class="sidebar-email">{{ user.email }}</div>
+            </div>
+            <nav class="sidebar-nav">
+              <a href="{% url 'profile' username=user.username %}" class="sidebar-nav-item active">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+              </a>
+              <a href="{% url 'order_history' %}" class="sidebar-nav-item">
+                <i class="fas fa-box"></i>
+                <span>My Orders</span>
+              </a>
+              <a href="{% url 'wishlist' %}" class="sidebar-nav-item">
+                <i class="fas fa-heart"></i>
+                <span>Wishlist</span>
+              </a>
+              <a href="{% url 'shipping-address' %}" class="sidebar-nav-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Addresses</span>
+              </a>
+              <a href="{% url 'change_password' %}" class="sidebar-nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+              </a>
+              <a href="{% url 'logout' %}" class="sidebar-nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+              </a>
+            </nav>
           </div>
         </div>
-      </div>
 
-      <!-- Account Details Card -->
-      <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
-        <div class="profile-card">
-          <div class="profile-card-header">
-            <i class="fas fa-user-edit"></i>
-            Account Details
+        <!-- Main Content Area -->
+        <div class="col-lg-9">
+          <!-- Quick Stats -->
+          <div class="quick-stats" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-item">
+              <div class="stat-number">{{ user.profile.get_order_count|default:'0' }}</div>
+              <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ user.wishlist.count|default:'0' }}</div>
+              <div class="stat-label">Wishlist Items</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ user.profile.get_cart_count|default:'0' }}</div>
+              <div class="stat-label">Cart Items</div>
+            </div>
           </div>
-          <div class="profile-card-body">
-            <form method="POST" enctype="multipart/form-data">
-              {% csrf_token %}
-              {{ user_form|crispy }}
-              {{ profile_form|crispy }}
-              <button class="btn-update-profile" type="submit">
-                <i class="fas fa-save"></i>
-                Update Profile
-              </button>
-            </form>
+
+          <!-- Profile Form -->
+          <div class="profile-content-card" data-aos="fade-up" data-aos-delay="150">
+            <div class="card-header-custom">
+              <h3><i class="fas fa-user-edit"></i> Personal Information</h3>
+            </div>
+            <div class="card-body-custom">
+              <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Avatar Upload -->
+                <div class="avatar-upload-section">
+                  <div class="avatar-preview">
+                    {% if user.profile.profile_image %}
+                      <img src="{{ user.profile.profile_image.url }}" alt="Profile" id="avatarPreview">
+                    {% else %}
+                      <img src="{% static 'images/default-profile.png' %}" alt="Default" id="avatarPreview">
+                    {% endif %}
+                    <label for="avatarInput" class="avatar-upload-btn">
+                      <i class="fas fa-camera"></i>
+                    </label>
+                  </div>
+                  <p class="avatar-info"><i class="fas fa-info-circle me-1"></i> Allowed formats: JPG, PNG (Max 5MB)</p>
+                </div>
+
+                {{ user_form|crispy }}
+                {{ profile_form|crispy }}
+                
+                <div class="text-end mt-4">
+                  <button type="submit" class="btn-save-profile">
+                    <i class="fas fa-check"></i>
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 {% endblock %}

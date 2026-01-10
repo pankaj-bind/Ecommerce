@@ -27,6 +27,9 @@ class Profile(BaseModel):
 
     def get_cart_count(self):
         return CartItem.objects.filter(cart__is_paid=False, cart__user=self.user).count()
+
+    def get_order_count(self):
+        return Order.objects.filter(user=self.user).count()
     
     def save(self, *args, **kwargs):
         # Check if the profile image is being updated and profile exists

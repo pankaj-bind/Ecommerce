@@ -463,7 +463,7 @@
           <div class="main-image-wrapper">
             {% for image in product.product_images.all %}
             {% if forloop.first %}
-            <img id="mainImage" src="/media/{{ image.image }}" alt="{{ product.product_name }}">
+            <img id="mainImage" src="{% if image.image %}{{ image.image.url }}{% elif image.image_url %}{{ image.image_url }}{% endif %}" alt="{{ product.product_name }}">
             {% endif %}
             {% endfor %}
           </div>
@@ -471,7 +471,7 @@
           <div class="thumbnail-wrapper">
             {% for image in product.product_images.all %}
             <div class="item-thumb">
-              <img src="/media/{{image.image}}" 
+              <img src="{% if image.image %}{{ image.image.url }}{% elif image.image_url %}{{ image.image_url }}{% endif %}" 
                    onclick="updateMainImage(this.src, this)"
                    class="{% if forloop.first %}active{% endif %}"
                    alt="Thumbnail">
